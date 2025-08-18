@@ -1,4 +1,4 @@
-# Use official PHP Apache imageee
+# Use official PHP Apache image
 FROM php:8.2-apache
 
 # Copy source code to container web root
