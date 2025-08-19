@@ -4,7 +4,7 @@ pipeline {
     environment {
         REPO_URL   = "https://github.com/Harendra-12/PHP.git"
         BRANCH     = "main"
-        SSH_SERVER = "Webserver"
+        SSH_SERVER = "18.223.151.223"
         IMAGE_NAME = "php_app"
         IMAGE_TAG  = "latest"
     }
