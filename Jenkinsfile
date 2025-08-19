@@ -19,22 +19,20 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                // Build the Docker image on Jenkins server
                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
+                sh "docker save -o ${IMAGE_FILE} ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
 
-        stage('Transfer Dockerfile to Webserver') {
+        stage('Transfer Docker Image to Webserver') {
             steps {
-                // Using Publish Over SSH plugin
                 sshPublisher(publishers: [
                     sshPublisherDesc(
                         configName: "${SSH_SERVER}",
                         transfers: [
                             sshTransfer(
-                                sourceFiles: 'Dockerfile',
+                                sourceFiles: "${IMAGE_FILE}",
                                 remoteDirectory: "${REMOTE_DIR}",
-                                removePrefix: '',
                                 flatten: true
                             )
                         ],
