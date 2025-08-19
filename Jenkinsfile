@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     environment {
-        REPO_URL    = "https://github.com/Harendra-12/PHP.git"
-        BRANCH      = "main"
-        SSH_SERVER  = "root@18.223.151.223"   // SSH_USER@HOST
-        IMAGE_NAME  = "php_app"
-        REMOTE_DIR  = "/PHP"
-        IMAGE_TAG   = "latest"
+        REPO_URL   = "https://github.com/Harendra-12/PHP.git"
+        BRANCH     = "main"
+        SSH_SERVER = "root@18.223.151.223"  // SSH user@host
+        IMAGE_NAME = "php_app"
+        IMAGE_TAG  = "latest"
     }
 
     stages {
@@ -23,20 +22,25 @@ pipeline {
             }
         }
 
-        stage('Direct Transfer Docker Image') {
+        stage('Transfer Docker Image to Webserver') {
             steps {
-                // Stream Docker image directly to remote server
-                sh "docker save ${IMAGE_NAME}:${IMAGE_TAG} | ssh ${SSH_SERVER} 'docker load'"
+                // Use Jenkins SSH credentials
+                sshagent(['jenkins-ssh-key-id']) {
+                    sh """
+                        docker save ${IMAGE_NAME}:${IMAGE_TAG} | \
+                        ssh -o StrictHostKeyChecking=no ${SSH_SERVER} 'docker load'
+                    """
+                }
             }
         }
     }
 
     post {
         success {
-            echo "✅ Docker image ${IMAGE_NAME}:${IMAGE_TAG} transferred and loaded successfully on ${SSH_SERVER}"
+            echo "✅ Docker image ${IMAGE_NAME}:${IMAGE_TAG} transferred successfully!"
         }
         failure {
-            echo "❌ Pipeline failed. Check logs for details."
+            echo "❌ Pipeline failed. Check logs."
         }
     }
 }
