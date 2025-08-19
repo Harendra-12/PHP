@@ -2,12 +2,13 @@ pipeline {
     agent any
 
     environment {
-        REPO_URL      = "https://github.com/Harendra-12/PHP.git"
-        BRANCH        = "main"
-        SSH_SERVER    = "Webserver"
-        REMOTE_DIR    = "/PHP/"
-        IMAGE_NAME    = "php_app"
-        IMAGE_TAG     = "latest"
+        REPO_URL   = "https://github.com/Harendra-12/PHP.git"
+        BRANCH     = "main"
+        SSH_SERVER = "Webserver"
+        REMOTE_DIR = "/root/webserver/PHP"
+        IMAGE_NAME = "php_app"
+        IMAGE_TAG  = "latest"
+        IMAGE_FILE = "php_app.tar"
     }
 
     stages {
@@ -36,7 +37,6 @@ pipeline {
                                 flatten: true
                             )
                         ],
-                        usePromotionTimestamp: false,
                         verbose: true
                     )
                 ])
@@ -46,7 +46,7 @@ pipeline {
 
     post {
         success {
-            echo "✅ PHP Dockerfile transferred successfully to ${SSH_SERVER}:${REMOTE_DIR}"
+            echo "✅ Docker image transferred successfully to ${SSH_SERVER}:${REMOTE_DIR}"
         }
         failure {
             echo "❌ Pipeline failed. Check logs."
