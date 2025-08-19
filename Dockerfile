@@ -1,3 +1,4 @@
+#PHP TEST
 # Use official PHP Apache image
 FROM php:8.2-apache
 
