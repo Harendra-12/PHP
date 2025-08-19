@@ -2,13 +2,11 @@ pipeline {
     agent any
 
     environment {
-        REPO_URL   = "https://github.com/Harendra-12/PHP.git"
-        BRANCH     = "main"
-        SSH_SERVER = "Webserver"
-        REMOTE_DIR = "/root/webserver/PHP"
-        IMAGE_NAME = "php_app"
-        IMAGE_TAG  = "latest"
-        IMAGE_FILE = "php_app.tar"
+        REPO_URL    = "https://github.com/Harendra-12/PHP.git"
+        BRANCH      = "main"
+        SSH_SERVER  = "root@18.223.151.223"   // SSH_USER@HOST
+        IMAGE_NAME  = "php_app"
+        IMAGE_TAG   = "latest"
     }
 
     stages {
@@ -21,35 +19,23 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                sh "docker save -o ${IMAGE_FILE} ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
 
-        stage('Transfer Docker Image to Webserver') {
+        stage('Direct Transfer Docker Image') {
             steps {
-                sshPublisher(publishers: [
-                    sshPublisherDesc(
-                        configName: "${SSH_SERVER}",
-                        transfers: [
-                            sshTransfer(
-                                sourceFiles: "${IMAGE_FILE}",
-                                remoteDirectory: "${REMOTE_DIR}",
-                                flatten: true
-                            )
-                        ],
-                        verbose: true
-                    )
-                ])
+                // Stream Docker image directly to remote server
+                sh "docker save ${IMAGE_NAME}:${IMAGE_TAG} | ssh ${SSH_SERVER} 'docker load'"
             }
         }
     }
 
     post {
         success {
-            echo "✅ Docker image transferred successfully to ${SSH_SERVER}:${REMOTE_DIR}"
+            echo "✅ Docker image ${IMAGE_NAME}:${IMAGE_TAG} transferred and loaded successfully on ${SSH_SERVER}"
         }
         failure {
-            echo "❌ Pipeline failed. Check logs."
+            echo "❌ Pipeline failed. Check logs for details."
         }
     }
 }
