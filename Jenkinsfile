@@ -6,6 +6,7 @@ pipeline {
         BRANCH      = "main"
         SSH_SERVER  = "root@18.223.151.223"   // SSH_USER@HOST
         IMAGE_NAME  = "php_app"
+        REMOTE_DIR  = "/PHP"
         IMAGE_TAG   = "latest"
     }
 
