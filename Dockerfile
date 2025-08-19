@@ -1,6 +1,6 @@
 #PHP TEST
 # Use official PHP Apache image
-FROM php:8.2-apache
+FROM php:8.2-apache-slim
 
 # Copy source code to container web root
 COPY . /var/www/html/
