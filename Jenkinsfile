@@ -7,7 +7,6 @@ pipeline {
         SSH_SERVER = "Webserver"
         IMAGE_NAME = "php_app"
         IMAGE_TAG  = "latest"
-        IMAGE_FILE = "php_app.tar"
     }
 
     stages {
@@ -20,32 +19,22 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
-                sh "docker save -o ${IMAGE_FILE} ${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
 
         stage('Transfer Docker Image to Webserver') {
             steps {
-                sshPublisher(publishers: [
-                    sshPublisherDesc(
-                        configName: "${SSH_SERVER}",
-                        transfers: [
-                            sshTransfer(
-                                sourceFiles: "${IMAGE_FILE}",
-                                remoteDirectory: "${REMOTE_DIR}",
-                                flatten: true
-                            )
-                        ],
-                        verbose: true
-                    )
-                ])
+                sh """
+                    docker save ${IMAGE_NAME}:${IMAGE_TAG} | \
+                    ssh -o StrictHostKeyChecking=no root@${SSH_SERVER} 'docker load'
+                """
             }
         }
     }
 
     post {
         success {
-            echo "✅ Docker image transferred successfully to ${SSH_SERVER}:${REMOTE_DIR}"
+            echo "✅ Docker image transferred successfully to ${SSH_SERVER}"
         }
         failure {
             echo "❌ Pipeline failed. Check logs."
