@@ -5,7 +5,7 @@ pipeline {
         REPO_URL      = "https://github.com/Harendra-12/PHP.git"
         BRANCH        = "main"
         SSH_SERVER    = "Webserver"
-        REMOTE_DIR    = "/root/webserver"
+        REMOTE_DIR    = "/root/webserver/PHP/"
         IMAGE_NAME    = "php_app"
         IMAGE_TAG     = "latest"
     }
